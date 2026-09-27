@@ -1,30 +1,117 @@
 # Easy Table Converter
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+A free, client-side web tool that converts tabular data between popular formats. Paste a table (or load sample data), pick a target format, and copy or download the converted output — all in the browser, with no sign-up and no server.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/pijako9357-1154s-projects/v0-easy-table-converter)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/K7kYnR277MH)
+## What it does
 
-## Overview
+- **Input:** paste tabular data, type it in an editable grid, or load built-in sample data.
+- **Convert:** one click transforms the table into the selected output format.
+- **Output:** live preview, copy-to-clipboard, and download of the converted text.
+- **Guided flow:** step bar (Input → Convert → Output) plus a How-to-Use panel.
+- **Multi-language UI:** English and Japanese (i18n toggle in `lib/i18n/translations.ts`).
+- **Table history:** recently converted tables are remembered via `useTableHistory`.
+- Cell selection helpers for copying ranges (`useTableSelection`).
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+## Supported formats
 
-## Deployment
+| Format     | Extension(s) | Notes                          |
+|------------|--------------|--------------------------------|
+| CSV        | `.csv`       | comma-separated                |
+| TSV        | `.tsv`       | tab-separated                  |
+| Markdown   | `.md`        | GitHub-style tables            |
+| HTML       | `.html`      | full `<table>` markup          |
+| JSON       | `.json`      | array of row objects           |
+| SQL        | `.sql`       | `INSERT INTO sample_table …`   |
+| YAML       | `.yml` / `.yaml` |                            |
+| XML        | `.xml`       |                                |
+| LaTeX      | `.tex`       | tabular environment            |
+| ASCII      | `.txt`       | plain-text table               |
+| Excel      | —            | Excel-pasteable format         |
 
-Your project is live at:
+Parsing input and generating output is pure client-side code in `lib/formatGenerators.ts` and the `useTableParsers` hook — nothing ever leaves the browser.
 
-**[https://vercel.com/pijako9357-1154s-projects/v0-easy-table-converter](https://vercel.com/pijako9357-1154s-projects/v0-easy-table-converter)**
+## Features
 
-## Build your app
+- Editable input grid with live conversion preview
+- Copy and download output in one click
+- Input parsers for pasted spreadsheets / delimited text
+- Conversion history (localStorage-backed)
+- Japanese + English UI
+- Dark/light theme (next-themes)
+- Responsive layout, shadcn/ui components
 
-Continue building your app on:
+## Tech stack
 
-**[https://v0.app/chat/projects/K7kYnR277MH](https://v0.app/chat/projects/K7kYnR277MH)**
+| Layer        | Technology                                |
+|--------------|-------------------------------------------|
+| Framework    | Next.js 15.2.4 (App Router)               |
+| UI library   | React 19                                  |
+| Styling      | Tailwind CSS 3.4, `tailwindcss-animate`   |
+| Components   | Radix UI + shadcn/ui                      |
+| Theming      | next-themes                               |
+| Fonts        | Geist (via `geist` package)               |
+| Analytics    | `@vercel/analytics`                       |
+| Language     | TypeScript                                |
 
-## How It Works
+## Quick start
 
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+```bash
+npm install --legacy-peer-deps
+npm run dev        # http://localhost:3000
+```
+
+Production build:
+
+```bash
+npm run build
+npm run start
+```
+
+## Project structure
+
+```
+.
+├── app/
+│   ├── page.tsx              # main converter page
+│   ├── layout.tsx            # root layout
+│   ├── loading.tsx
+│   └── globals.css
+├── components/
+│   ├── Header.tsx            # app header + language toggle
+│   ├── StepBar.tsx           # Input → Convert → Output steps
+│   ├── InputPanel.tsx        # paste/type/sample-data input
+│   ├── OutputPanel.tsx       # format picker + converted output
+│   ├── PreviewPanel.tsx      # live table preview
+│   ├── TableView.tsx         # editable data grid
+│   ├── HowToUse.tsx          # usage guide
+│   ├── theme-provider.tsx
+│   └── ui/                   # shadcn/ui primitives
+├── hooks/
+│   ├── useTableParsers.ts    # input parsing logic
+│   ├── useTableHistory.ts    # conversion history
+│   ├── useTableSelection.ts  # cell selection
+│   ├── useLanguage.ts        # i18n state
+│   └── use-toast.ts
+├── lib/
+│   ├── formatGenerators.ts   # all output-format generators
+│   ├── i18n/translations.ts  # English + Japanese strings
+│   ├── constants/            # format list, sample data
+│   └── types.ts
+├── public/
+└── next.config.mjs           # `output: "export"` + unoptimized images
+```
+
+## Environment variables
+
+None required.
+
+## Deployment notes
+
+- **Fully static** — no API routes, no server actions, no secrets. Host anywhere.
+- `next.config.mjs` sets `output: "export"` and `images.unoptimized: true`; `npm run build` emits a static site in `out/`.
+- This repo is deployed to GitHub Pages: https://girishlade111.github.io/easy-table-converter/
+- Note: `basePath: "/easy-table-converter"` is set so assets resolve under the GitHub Pages subpath. Remove it from `next.config.mjs` if you deploy to a domain root / Vercel instead.
+
+---
+
+Built by Girish Lade · [ladestack.in](https://ladestack.in)
